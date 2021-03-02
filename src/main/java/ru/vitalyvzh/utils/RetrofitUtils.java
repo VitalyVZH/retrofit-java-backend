@@ -13,12 +13,14 @@ import java.time.Duration;
 @UtilityClass
 public class RetrofitUtils {
 
+    HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new PrettyLogger());
+
     public Retrofit getRetrofit() throws MalformedURLException {
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(Duration.ofMinutes(1l))
                 .callTimeout(Duration.ofMinutes(1l))
-                .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                .addInterceptor(logging.setLevel(HttpLoggingInterceptor.Level.BODY))
                 .build();
 
         return new Retrofit.Builder()
