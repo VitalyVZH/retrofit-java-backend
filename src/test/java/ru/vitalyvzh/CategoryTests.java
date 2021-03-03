@@ -4,8 +4,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.dto.Category;
 import ru.vitalyvzh.service.CategoryService;
 import ru.vitalyvzh.utils.RetrofitUtils;

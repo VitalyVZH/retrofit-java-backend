@@ -24,7 +24,7 @@ public class RetrofitUtils {
                 .build();
 
         return new Retrofit.Builder()
-            .baseUrl(new URL("http://80.78.248.82:8189/market/api/v1/"))
+            .baseUrl(ConfigUtils.getBaseUrl())
             .client(client)
             .addConverterFactory(JacksonConverterFactory.create())
             .build();
