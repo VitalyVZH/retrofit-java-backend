@@ -6,7 +6,7 @@ import okhttp3.ResponseBody;
 import org.junit.jupiter.api.*;
 import retrofit2.Response;
 import ru.vitalyvzh.base.enums.CategoryType;
-import ru.vitalyvzh.dto.Category;
+import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
 import ru.vitalyvzh.utils.RetrofitUtils;
@@ -14,7 +14,6 @@ import ru.vitalyvzh.utils.RetrofitUtils;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.vitalyvzh.base.enums.CategoryType.FOOD;
 
 @DisplayName("Проверки запросов конкретных товаров")
 public class ProductGetTests {
@@ -51,15 +50,39 @@ public class ProductGetTests {
     @DisplayName("Запрос существующего продукта")
     @SneakyThrows
     @Test
-    void getProductTest() {
+    void getProductPositiveTest() {
         Response<Product> response = productService
-                .getCategory(productId)
+                .getProduct(productId)
                 .execute();
         assertThat(response.isSuccessful()).isTrue();
         assertThat(response.code()).isEqualTo(200);
         assertThat(response.body().getId()).isNotNull();
 
     }
+
+    @DisplayName("Запрос продукта по несуществующему ID")
+    @SneakyThrows
+    @Test
+    void getProductNegativeTest() {
+        Response<Product> response = productService
+                .getProduct(faker.number().numberBetween(1, 1000))
+                .execute();
+        assertThat(response.code()).isEqualTo(404);
+        assertThat(response.errorBody().string()).contains(Errors.CODE404PROD.getMessage());
+    }
+
+    @DisplayName("Запрос всех продуктов без указания ID")
+    @SneakyThrows
+    @Test
+    void getAllProductPositiveTest() {
+        Response<Product> response = productService
+                .getProduct()
+                .execute();
+//        assertThat(response.isSuccessful()).isTrue();
+        assertThat(response.code()).isEqualTo(200);
+//        assertThat(response.body().getId()).isNotNull();
+    }
+
 
     @AfterEach
     void tearDown() {

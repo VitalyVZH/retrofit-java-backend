@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.*;
+import retrofit2.Response;
 import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
@@ -14,13 +15,13 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-@DisplayName("Проверки добавления конкретных товаров")
-public class ProductUploadTests {
+@DisplayName("Проверки обновления товаров")
+public class ProductUpdateTests {
 
     Faker faker = new Faker();
     static ProductService productService;
     Product product;
+    Product secondProduct;
     Integer productId;
 
     @SneakyThrows
@@ -31,18 +32,18 @@ public class ProductUploadTests {
                 .create(ProductService.class);
     }
 
+    @SneakyThrows
     @BeforeEach
     void setUp() {
         product = new Product()
                 .withTitle(faker.food().fruit())
                 .withPrice((int) (Math.random() * 1000 + 1))
                 .withCategoryTitle(CategoryType.FOOD.getTitle());
-    }
+        secondProduct = new Product()
+                .withTitle(faker.food().fruit())
+                .withPrice((int) (Math.random() * 1000 + 1))
+                .withCategoryTitle(CategoryType.FOOD.getTitle());
 
-    @DisplayName("Добавление нового товара")
-    @SneakyThrows
-    @Test
-    void createNewProductPositiveTest() {
         retrofit2.Response<Product> response = productService
                 .createProduct(product)
                 .execute();
@@ -51,21 +52,39 @@ public class ProductUploadTests {
         assertThat(response.code()).isEqualTo(201);
     }
 
-    @DisplayName("Негативный тест добавления нового товара")
+    @DisplayName("Обновление существующего продукта без указания ID")
     @SneakyThrows
     @Test
-    void createNewProductNegativeTest() {
-        retrofit2.Response<Product> response = productService
-                .createProduct(product.withId(faker.number().numberBetween(1, 1000)))
+    void updateProductNewPositiveTest() {
+
+        Response<ResponseBody> response = productService
+                .updateProduct(product.withTitle(faker.food().fruit()))
                 .execute();
 
-        if(response.body() != null) {
-            productId = response.body().getId();
-        } else {
-            productId = null;
-        }
+        assertThat(response.errorBody().string().contains(Errors.CODE400NOTNULL.getMessage()));
 
-        assertThat(response.errorBody().string()).contains(Errors.CODE400NULL.getMessage());
+    }
+
+    @DisplayName("Обновление продукта по несуществующему ID")
+    @SneakyThrows
+    @Test
+    void updateProductNoExistIdNegativeTest() {
+        Response<ResponseBody> response = productService
+                .updateProduct(faker.number().numberBetween(1, 1000), secondProduct)
+                .execute();
+        assertThat(response.code()).isEqualTo(405);
+        assertThat(response.errorBody().string()).contains(Errors.CODE405.getMessage());
+    }
+
+    @DisplayName("Обновление продукта по существующему ID")
+    @SneakyThrows
+    @Test
+    void updateProductExistIdNegativeTest() {
+        Response<ResponseBody> response = productService
+                .updateProduct(productId, secondProduct)
+                .execute();
+        assertThat(response.code()).isEqualTo(405);
+        assertThat(response.errorBody().string()).contains(Errors.CODE405.getMessage());
     }
 
     @AfterEach
