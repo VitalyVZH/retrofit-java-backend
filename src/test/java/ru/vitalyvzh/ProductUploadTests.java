@@ -2,15 +2,13 @@ package ru.vitalyvzh;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
-import okhttp3.ResponseBody;
 import org.junit.jupiter.api.*;
 import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
 import ru.vitalyvzh.utils.RetrofitUtils;
-
-import java.io.IOException;
+import ru.vitalyvzh.utils.TearDown;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,7 +18,7 @@ public class ProductUploadTests {
 
     Faker faker = new Faker();
     static ProductService productService;
-    Product product;
+    Product product, product2;
     Integer productId;
 
     @SneakyThrows
@@ -71,16 +69,6 @@ public class ProductUploadTests {
     @AfterEach
     void tearDown() {
 
-        if(productId != null) {
-            try {
-                retrofit2.Response<ResponseBody> response = productService
-                        .deleteProduct(productId)
-                        .execute();
-                assertThat(response.isSuccessful()).isTrue();
-                assertThat(response.code()).isEqualTo(200);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        TearDown.finishTests(productId, productService);
     }
 }

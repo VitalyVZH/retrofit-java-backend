@@ -10,8 +10,8 @@ import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
 import ru.vitalyvzh.utils.RetrofitUtils;
+import ru.vitalyvzh.utils.TearDown;
 
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -90,16 +90,6 @@ public class ProductUpdateTests {
     @AfterEach
     void tearDown() {
 
-        if(productId != null) {
-            try {
-                retrofit2.Response<ResponseBody> response = productService
-                        .deleteProduct(productId)
-                        .execute();
-                assertThat(response.isSuccessful()).isTrue();
-                assertThat(response.code()).isEqualTo(200);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        TearDown.finishTests(productId, productService);
     }
 }

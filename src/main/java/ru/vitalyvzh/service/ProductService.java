@@ -1,10 +1,8 @@
 package ru.vitalyvzh.service;
 
 import okhttp3.ResponseBody;
-import org.assertj.core.internal.bytebuddy.implementation.bind.annotation.Empty;
 import retrofit2.Call;
 import retrofit2.http.*;
-import ru.vitalyvzh.dto.Category;
 import ru.vitalyvzh.dto.Product;
 
 public interface ProductService {
@@ -23,7 +21,6 @@ public interface ProductService {
 
     @PUT("products/{id}")
     Call<ResponseBody> updateProduct(@Path("id") Integer id, @Body Product updateProductRequest);
-
 
     @DELETE("products/{id}")
     Call<ResponseBody> deleteProduct(@Path("id") int id);
