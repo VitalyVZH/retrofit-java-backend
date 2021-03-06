@@ -7,7 +7,8 @@ public enum Errors {
     CODE400NOTNULL("Id must be not null for new entity"),
     CODE404PROD("Unable to find product with id: "),
     CODE404CAT("Unable to find category with id: "),
-    CODE405("Method Not Allowed");
+    CODE405("Method Not Allowed"),
+    CODE500("Internal Server Error");
 
     @Getter
     private final String message;
