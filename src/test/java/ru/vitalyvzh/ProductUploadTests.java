@@ -3,11 +3,11 @@ package ru.vitalyvzh;
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
-import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
 import ru.vitalyvzh.utils.RetrofitUtils;
+import ru.vitalyvzh.utils.SetUp;
 import ru.vitalyvzh.utils.TearDown;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,7 +18,7 @@ public class ProductUploadTests {
 
     Faker faker = new Faker();
     static ProductService productService;
-    Product product, product2;
+    Product product;
     Integer productId;
 
     @SneakyThrows
@@ -31,10 +31,9 @@ public class ProductUploadTests {
 
     @BeforeEach
     void setUp() {
-        product = new Product()
-                .withTitle(faker.food().fruit())
-                .withPrice((int) (Math.random() * 1000 + 1))
-                .withCategoryTitle(CategoryType.FOOD.getTitle());
+
+        product = SetUp.createProduct();
+
     }
 
     @DisplayName("Добавление нового товара")

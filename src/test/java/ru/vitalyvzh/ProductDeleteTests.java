@@ -12,6 +12,7 @@ import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
 import ru.vitalyvzh.utils.RetrofitUtils;
+import ru.vitalyvzh.utils.SetUp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,7 +20,6 @@ public class ProductDeleteTests {
 
     Faker faker = new Faker();
     static ProductService productService;
-    Product product, product2;
     Integer productId;
 
     @SneakyThrows
@@ -33,13 +33,9 @@ public class ProductDeleteTests {
     @SneakyThrows
     @BeforeEach
     void setUp() {
-        product = new Product()
-                .withTitle(faker.food().fruit())
-                .withPrice((int) (Math.random() * 1000 + 1))
-                .withCategoryTitle(CategoryType.FOOD.getTitle());
 
         retrofit2.Response<Product> response = productService
-                .createProduct(product)
+                .createProduct(SetUp.createProduct())
                 .execute();
         productId = response.body().getId();
     }

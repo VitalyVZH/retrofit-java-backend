@@ -2,17 +2,15 @@ package ru.vitalyvzh;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
-import okhttp3.ResponseBody;
 import org.junit.jupiter.api.*;
 import retrofit2.Response;
-import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
 import ru.vitalyvzh.utils.RetrofitUtils;
+import ru.vitalyvzh.utils.SetUp;
 import ru.vitalyvzh.utils.TearDown;
 
-import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,7 +19,6 @@ public class ProductGetTests {
 
     Faker faker = new Faker();
     static ProductService productService;
-    Product product;
     Integer productId;
 
     @SneakyThrows
@@ -35,13 +32,9 @@ public class ProductGetTests {
     @SneakyThrows
     @BeforeEach
     void setUp() {
-        product = new Product()
-                .withTitle(faker.food().fruit())
-                .withPrice((int) (Math.random() * 1000 + 1))
-                .withCategoryTitle(CategoryType.FOOD.getTitle());
 
         retrofit2.Response<Product> response = productService
-                .createProduct(product)
+                .createProduct(SetUp.createProduct())
                 .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
@@ -79,9 +72,8 @@ public class ProductGetTests {
         Response<Product> response = productService
                 .getProduct()
                 .execute();
-//        assertThat(response.isSuccessful()).isTrue();
         assertThat(response.code()).isEqualTo(200);
-//        assertThat(response.body().getId()).isNotNull();
+        assertThat(response.body().getId()).isNotNull();
     }
 
 

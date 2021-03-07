@@ -5,11 +5,11 @@ import lombok.SneakyThrows;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.*;
 import retrofit2.Response;
-import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
 import ru.vitalyvzh.utils.RetrofitUtils;
+import ru.vitalyvzh.utils.SetUp;
 import ru.vitalyvzh.utils.TearDown;
 
 
@@ -35,14 +35,9 @@ public class ProductUpdateTests {
     @SneakyThrows
     @BeforeEach
     void setUp() {
-        product = new Product()
-                .withTitle(faker.food().fruit())
-                .withPrice((int) (Math.random() * 1000 + 1))
-                .withCategoryTitle(CategoryType.FOOD.getTitle());
-        secondProduct = new Product()
-                .withTitle(faker.food().fruit())
-                .withPrice((int) (Math.random() * 1000 + 1))
-                .withCategoryTitle(CategoryType.FOOD.getTitle());
+
+        product = SetUp.createProduct();
+        secondProduct = SetUp.createProduct();
 
         retrofit2.Response<Product> response = productService
                 .createProduct(product)
