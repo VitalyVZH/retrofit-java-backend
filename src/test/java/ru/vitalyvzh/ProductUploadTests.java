@@ -3,6 +3,7 @@ package ru.vitalyvzh;
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
+import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
@@ -24,6 +25,7 @@ public class ProductUploadTests {
     @SneakyThrows
     @BeforeAll
     static void beforeAll() {
+
         productService = RetrofitUtils
                 .getRetrofit()
                 .create(ProductService.class);
@@ -46,6 +48,7 @@ public class ProductUploadTests {
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
         assertThat(response.code()).isEqualTo(201);
+        assertThat(response.body().getCategoryTitle()).isEqualTo(CategoryType.FOOD.getTitle());
     }
 
     @DisplayName("Негативный тест добавления нового товара")
@@ -62,6 +65,7 @@ public class ProductUploadTests {
             productId = null;
         }
 
+        assertThat(response.isSuccessful()).isFalse();
         assertThat(response.errorBody().string()).contains(Errors.CODE400NULL.getMessage());
     }
 

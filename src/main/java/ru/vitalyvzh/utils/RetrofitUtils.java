@@ -6,8 +6,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.Duration;
 
 @UtilityClass
@@ -15,11 +13,11 @@ public class RetrofitUtils {
 
     HttpLoggingInterceptor logging = new HttpLoggingInterceptor(new PrettyLogger());
 
-    public Retrofit getRetrofit() throws MalformedURLException {
+    public Retrofit getRetrofit(){
 
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(Duration.ofMinutes(1l))
-                .callTimeout(Duration.ofMinutes(1l))
+                .connectTimeout(Duration.ofMinutes(1L))
+                .callTimeout(Duration.ofMinutes(1L))
                 .addInterceptor(logging.setLevel(HttpLoggingInterceptor.Level.BODY))
                 .build();
 

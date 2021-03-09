@@ -4,7 +4,7 @@ import lombok.Getter;
 
 public enum Errors {
     CODE400NULL("Id must be null for new entity"),
-    CODE400NOTNULL("Id must be not null for new entity"),
+    CODE400NOEXIST("doesn't exist"),
     CODE404PROD("Unable to find product with id: "),
     CODE404CAT("Unable to find category with id: "),
     CODE405("Method Not Allowed"),

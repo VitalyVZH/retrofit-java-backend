@@ -11,7 +11,6 @@ import ru.vitalyvzh.utils.RetrofitUtils;
 import ru.vitalyvzh.utils.SetUp;
 import ru.vitalyvzh.utils.TearDown;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Проверки запросов конкретных товаров")
@@ -20,6 +19,7 @@ public class ProductGetTests {
     Faker faker = new Faker();
     static ProductService productService;
     Integer productId;
+    Response<Product> response;
 
     @SneakyThrows
     @BeforeAll
@@ -33,9 +33,10 @@ public class ProductGetTests {
     @BeforeEach
     void setUp() {
 
-        retrofit2.Response<Product> response = productService
+        response = productService
                 .createProduct(SetUp.createProduct())
                 .execute();
+
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
         assertThat(response.code()).isEqualTo(201);
@@ -51,6 +52,7 @@ public class ProductGetTests {
         assertThat(response.isSuccessful()).isTrue();
         assertThat(response.code()).isEqualTo(200);
         assertThat(response.body().getId()).isNotNull();
+        assertThat((response.body().getId()).equals(productId));
 
     }
 
@@ -61,6 +63,7 @@ public class ProductGetTests {
         Response<Product> response = productService
                 .getProduct(faker.number().numberBetween(1, 1000))
                 .execute();
+        assertThat(response.isSuccessful()).isFalse();
         assertThat(response.code()).isEqualTo(404);
         assertThat(response.errorBody().string()).contains(Errors.CODE404PROD.getMessage());
     }
@@ -69,11 +72,11 @@ public class ProductGetTests {
     @SneakyThrows
     @Test
     void getAllProductPositiveTest() {
-        Response<Product> response = productService
-                .getProduct()
+        Response<Product[]> response = productService
+                .getProducts()
                 .execute();
         assertThat(response.code()).isEqualTo(200);
-        assertThat(response.body().getId()).isNotNull();
+        assertThat(response.isSuccessful()).isTrue();
     }
 
 

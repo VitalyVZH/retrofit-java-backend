@@ -2,9 +2,9 @@ package ru.vitalyvzh;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
-import okhttp3.ResponseBody;
 import org.junit.jupiter.api.*;
 import retrofit2.Response;
+import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
@@ -23,6 +23,7 @@ public class ProductUpdateTests {
     Product product;
     Product secondProduct;
     Integer productId;
+    Response<Product> response;
 
     @SneakyThrows
     @BeforeAll
@@ -39,47 +40,71 @@ public class ProductUpdateTests {
         product = SetUp.createProduct();
         secondProduct = SetUp.createProduct();
 
-        retrofit2.Response<Product> response = productService
-                .createProduct(product)
+        response = productService
+                .createProduct(SetUp.createProduct())
                 .execute();
+
+//        retrofit2.Response<Product> response = productService
+//                .createProduct(product)
+//                .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
         assertThat(response.code()).isEqualTo(201);
     }
 
-    @DisplayName("Обновление существующего продукта без указания ID")
+
+
+    @DisplayName("Позитивное обновление существующего продукта")
     @SneakyThrows
     @Test
     void updateProductNewPositiveTest() {
 
-        Response<ResponseBody> response = productService
-                .updateProduct(product.withTitle(faker.food().fruit()))
+        Response<Product> response = productService
+                .updateProduct(new Product()
+                .withId(productId)
+                .withTitle(faker.food().fruit())
+                .withPrice(faker.number().numberBetween(1, 1000))
+                .withCategoryTitle(CategoryType.FOOD.getTitle()))
                 .execute();
 
-        assertThat(response.errorBody().string().contains(Errors.CODE400NOTNULL.getMessage()));
+        assertThat(response.isSuccessful()).isTrue();
+        assertThat(response.code()).isEqualTo(200);
 
     }
 
-    @DisplayName("Обновление продукта по несуществующему ID")
+    @DisplayName("Обновление существующего продукта по несуществующему ID")
     @SneakyThrows
     @Test
     void updateProductNoExistIdNegativeTest() {
-        Response<ResponseBody> response = productService
-                .updateProduct(faker.number().numberBetween(1, 1000), secondProduct)
+        Response<Product> response = productService
+                .updateProduct(new Product()
+                .withId(faker.number().randomDigit())
+                .withTitle(faker.food().fruit())
+                .withPrice(faker.number().numberBetween(1, 1000))
+                .withCategoryTitle(CategoryType.FOOD.getTitle()))
                 .execute();
-        assertThat(response.code()).isEqualTo(405);
-        assertThat(response.errorBody().string()).contains(Errors.CODE405.getMessage());
+        assertThat(response.isSuccessful()).isFalse();
+        assertThat(response.code()).isEqualTo(400);
+        assertThat(response.errorBody().string()).contains(Errors.CODE400NOEXIST.getMessage());
     }
 
-    @DisplayName("Обновление продукта по существующему ID")
+    @DisplayName("Обновление существующего продукта с несуществующей категорией")
     @SneakyThrows
     @Test
-    void updateProductExistIdNegativeTest() {
-        Response<ResponseBody> response = productService
-                .updateProduct(productId, secondProduct)
+    void updateProductNoExistCategoryNegativeTest() {
+
+        Response<Product> response = productService
+                .updateProduct(new Product()
+                .withId(productId)
+                .withTitle(faker.food().fruit())
+                .withPrice(faker.number().numberBetween(1, 1000))
+                .withCategoryTitle(faker.animal().name()))
                 .execute();
-        assertThat(response.code()).isEqualTo(405);
-        assertThat(response.errorBody().string()).contains(Errors.CODE405.getMessage());
+
+        assertThat(response.isSuccessful()).isFalse();
+        assertThat(response.code()).isEqualTo(500);
+        assertThat(response.errorBody().string()).contains(Errors.CODE500.getMessage());
+
     }
 
     @AfterEach

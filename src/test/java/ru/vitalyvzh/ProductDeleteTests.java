@@ -7,20 +7,24 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.vitalyvzh.base.enums.CategoryType;
+import retrofit2.Response;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
 import ru.vitalyvzh.utils.RetrofitUtils;
 import ru.vitalyvzh.utils.SetUp;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("Проверки удаления товаров")
 public class ProductDeleteTests {
 
     Faker faker = new Faker();
     static ProductService productService;
     Integer productId;
+    Response<Product> response;
 
     @SneakyThrows
     @BeforeAll
@@ -34,9 +38,10 @@ public class ProductDeleteTests {
     @BeforeEach
     void setUp() {
 
-        retrofit2.Response<Product> response = productService
+        response = productService
                 .createProduct(SetUp.createProduct())
                 .execute();
+
         productId = response.body().getId();
     }
 
@@ -47,6 +52,7 @@ public class ProductDeleteTests {
         retrofit2.Response<ResponseBody> response = productService
                 .deleteProduct(productId)
                 .execute();
+
         assertThat(response.isSuccessful()).isTrue();
         assertThat(response.code()).isEqualTo(200);
     }
@@ -59,7 +65,21 @@ public class ProductDeleteTests {
                 .deleteProduct(faker.number().numberBetween(1, 1000))
                 .execute();
 
+        assertThat(response.isSuccessful()).isFalse();
         assertThat(response.code()).isEqualTo(500);
         assertThat(response.errorBody().string().contains(Errors.CODE500.getMessage()));
+    }
+
+    @DisplayName("Удаление продукта без указания ID")
+    @SneakyThrows
+    @Test
+    void deleteProductWithoutIdNegativeTest() {
+        retrofit2.Response<ResponseBody> response = productService
+                .deleteProductWithoutId()
+                .execute();
+
+        assertThat(response.isSuccessful()).isFalse();
+        assertThat(response.code()).isEqualTo(405);
+        assertThat(response.errorBody().string().contains(Errors.CODE405.getMessage()));
     }
 }

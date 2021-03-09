@@ -11,19 +11,19 @@ public interface ProductService {
     Call<Product> getProduct(@Path("id") Integer id);
 
     @GET("products")
-    Call<Product> getProduct();
+    Call<Product[]> getProducts();
 
     @POST("products")
     Call<Product> createProduct(@Body Product createProductRequest);
 
     @PUT("products")
-    Call<ResponseBody> updateProduct(@Body Product updateProductRequest);
-
-    @PUT("products/{id}")
-    Call<ResponseBody> updateProduct(@Path("id") Integer id, @Body Product updateProductRequest);
+    Call<Product> updateProduct(@Body Product updateProductRequest);
 
     @DELETE("products/{id}")
     Call<ResponseBody> deleteProduct(@Path("id") int id);
+
+    @DELETE("products")
+    Call<ResponseBody> deleteProductWithoutId();
 
 
 }
