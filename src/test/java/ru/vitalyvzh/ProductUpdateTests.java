@@ -44,9 +44,6 @@ public class ProductUpdateTests {
                 .createProduct(SetUp.createProduct())
                 .execute();
 
-//        retrofit2.Response<Product> response = productService
-//                .createProduct(product)
-//                .execute();
         productId = response.body().getId();
         assertThat(response.isSuccessful()).isTrue();
         assertThat(response.code()).isEqualTo(201);
