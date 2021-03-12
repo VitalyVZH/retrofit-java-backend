@@ -9,8 +9,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import retrofit2.Response;
 import ru.vitalyvzh.base.enums.Errors;
+import ru.vitalyvzh.db.dao.ProductsMapper;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
+import ru.vitalyvzh.utils.DbUtils;
 import ru.vitalyvzh.utils.RetrofitUtils;
 import ru.vitalyvzh.utils.SetUp;
 
@@ -25,10 +27,15 @@ public class ProductDeleteTests {
     static ProductService productService;
     Integer productId;
     Response<Product> response;
+    static ProductsMapper productsMapper;
 
     @SneakyThrows
     @BeforeAll
     static void beforeAll() {
+
+        productsMapper = DbUtils
+                .getProductsMapper();
+
         productService = RetrofitUtils
                 .getRetrofit()
                 .create(ProductService.class);
@@ -43,24 +50,34 @@ public class ProductDeleteTests {
                 .execute();
 
         productId = response.body().getId();
+        assertThat(productsMapper.selectByPrimaryKey(Long.valueOf(productId)).getPrice())
+                .isEqualTo(response.body().getPrice());
+        assertThat(productsMapper.selectByPrimaryKey(Long.valueOf(productId)).getTitle())
+                .isEqualTo(response.body().getTitle());
+
     }
 
     @DisplayName("Удаление продукта по заданному ID")
     @SneakyThrows
     @Test
     void deleteProductPositiveTest() {
-        retrofit2.Response<ResponseBody> response = productService
-                .deleteProduct(productId)
-                .execute();
+
+        DbUtils.getProductsMapper().deleteByPrimaryKey(Long.valueOf(productId));
+
+//        retrofit2.Response<ResponseBody> response = productService
+//                .deleteProduct(productId)
+//                .execute();
 
         assertThat(response.isSuccessful()).isTrue();
-        assertThat(response.code()).isEqualTo(200);
+        assertThat(response.code()).isEqualTo(201);
+        assertThat(DbUtils.getProductsMapper().selectByPrimaryKey(Long.valueOf(productId))).isNull();
     }
 
     @DisplayName("Удаление продукта по не существующему ID")
     @SneakyThrows
     @Test
     void deleteProductNegativeTest() {
+
         retrofit2.Response<ResponseBody> response = productService
                 .deleteProduct(faker.number().numberBetween(1, 1000))
                 .execute();
@@ -74,6 +91,7 @@ public class ProductDeleteTests {
     @SneakyThrows
     @Test
     void deleteProductWithoutIdNegativeTest() {
+
         retrofit2.Response<ResponseBody> response = productService
                 .deleteProductWithoutId()
                 .execute();

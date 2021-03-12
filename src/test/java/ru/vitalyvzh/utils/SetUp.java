@@ -8,10 +8,9 @@ public class SetUp {
 
     public static Product createProduct() {
 
-        Product product;
         Faker faker = new Faker();
 
-        product = new Product()
+        Product product = new Product()
                 .withTitle(faker.food().fruit())
                 .withPrice((int) (Math.random() * 1000 + 1))
                 .withCategoryTitle(CategoryType.FOOD.getTitle());

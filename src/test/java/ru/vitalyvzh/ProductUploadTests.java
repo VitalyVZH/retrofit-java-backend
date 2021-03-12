@@ -5,8 +5,10 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
+import ru.vitalyvzh.db.dao.ProductsMapper;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
+import ru.vitalyvzh.utils.DbUtils;
 import ru.vitalyvzh.utils.RetrofitUtils;
 import ru.vitalyvzh.utils.SetUp;
 import ru.vitalyvzh.utils.TearDown;
@@ -21,11 +23,14 @@ public class ProductUploadTests {
     static ProductService productService;
     Product product;
     Integer productId;
+    static ProductsMapper productsMapper;
 
     @SneakyThrows
     @BeforeAll
     static void beforeAll() {
 
+        productsMapper = DbUtils
+                .getProductsMapper();
         productService = RetrofitUtils
                 .getRetrofit()
                 .create(ProductService.class);
@@ -49,6 +54,8 @@ public class ProductUploadTests {
         assertThat(response.isSuccessful()).isTrue();
         assertThat(response.code()).isEqualTo(201);
         assertThat(response.body().getCategoryTitle()).isEqualTo(CategoryType.FOOD.getTitle());
+        assertThat(productsMapper.selectByPrimaryKey(Long.valueOf(productId)).getTitle())
+                .isEqualTo(product.getTitle());
     }
 
     @DisplayName("Негативный тест добавления нового товара")
@@ -69,6 +76,7 @@ public class ProductUploadTests {
         assertThat(response.errorBody().string()).contains(Errors.CODE400NULL.getMessage());
     }
 
+    @SneakyThrows
     @AfterEach
     void tearDown() {
 

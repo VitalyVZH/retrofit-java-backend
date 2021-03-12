@@ -49,8 +49,6 @@ public class ProductUpdateTests {
         assertThat(response.code()).isEqualTo(201);
     }
 
-
-
     @DisplayName("Позитивное обновление существующего продукта")
     @SneakyThrows
     @Test
@@ -104,6 +102,7 @@ public class ProductUpdateTests {
 
     }
 
+    @SneakyThrows
     @AfterEach
     void tearDown() {
 

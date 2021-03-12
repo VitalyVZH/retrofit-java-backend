@@ -20,7 +20,7 @@ public interface ProductService {
     Call<Product> updateProduct(@Body Product updateProductRequest);
 
     @DELETE("products/{id}")
-    Call<ResponseBody> deleteProduct(@Path("id") int id);
+    Call<ResponseBody> deleteProduct(@Path("id") Integer id);
 
     @DELETE("products")
     Call<ResponseBody> deleteProductWithoutId();

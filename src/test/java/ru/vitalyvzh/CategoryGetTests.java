@@ -8,6 +8,7 @@ import retrofit2.Response;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Category;
 import ru.vitalyvzh.service.CategoryService;
+import ru.vitalyvzh.utils.DbUtils;
 import ru.vitalyvzh.utils.RetrofitUtils;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ public class CategoryGetTests {
     @DisplayName("Позитивная проверка категории Food")
     @Test
     void getFoodCategoryPositiveTest() throws IOException {
+
         Response<Category> response = categoryService
                 .getCategory(FOOD.getId())
                 .execute();

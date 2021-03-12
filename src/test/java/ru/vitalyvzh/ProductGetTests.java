@@ -5,11 +5,14 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import retrofit2.Response;
 import ru.vitalyvzh.base.enums.Errors;
+import ru.vitalyvzh.db.dao.ProductsMapper;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
+import ru.vitalyvzh.utils.DbUtils;
 import ru.vitalyvzh.utils.RetrofitUtils;
 import ru.vitalyvzh.utils.SetUp;
 import ru.vitalyvzh.utils.TearDown;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,10 +23,14 @@ public class ProductGetTests {
     static ProductService productService;
     Integer productId;
     Response<Product> response;
+    static ProductsMapper productsMapper;
 
     @SneakyThrows
     @BeforeAll
     static void beforeAll() {
+
+        productsMapper = DbUtils
+                .getProductsMapper();
         productService = RetrofitUtils
                 .getRetrofit()
                 .create(ProductService.class);
@@ -79,7 +86,7 @@ public class ProductGetTests {
         assertThat(response.isSuccessful()).isTrue();
     }
 
-
+    @SneakyThrows
     @AfterEach
     void tearDown() {
 
