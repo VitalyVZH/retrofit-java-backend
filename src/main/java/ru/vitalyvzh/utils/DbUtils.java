@@ -17,21 +17,19 @@ public class DbUtils {
 
     private static String resource = "mybatisConfig.xml";
 
-    @SneakyThrows
-    public static CategoriesMapper getCategoryMapper() {
+    public static CategoriesMapper getCategoryMapper() throws IOException {
         return getSqlSession().getMapper(CategoriesMapper.class);
     }
 
+    public static ProductsMapper getProductsMapper() throws IOException {
 
-    @SneakyThrows
-    public static ProductsMapper getProductsMapper() {
         return getSqlSession().getMapper(ProductsMapper.class);
     }
 
     private static SqlSession getSqlSession() throws IOException {
-        SqlSessionFactory sqlSessionFactory;
         InputStream is = Resources.getResourceAsStream(resource);
-        sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);
-        return sqlSessionFactory.openSession(true);
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);
+        SqlSession session = sqlSessionFactory.openSession(true);
+        return session;
     }
 }

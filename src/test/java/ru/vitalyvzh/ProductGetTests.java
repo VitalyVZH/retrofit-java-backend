@@ -1,33 +1,29 @@
 package ru.vitalyvzh;
 
 import com.github.javafaker.Faker;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import retrofit2.Response;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.db.dao.ProductsMapper;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
-import ru.vitalyvzh.utils.DbUtils;
-import ru.vitalyvzh.utils.RetrofitUtils;
-import ru.vitalyvzh.utils.SetUp;
-import ru.vitalyvzh.utils.TearDown;
+import ru.vitalyvzh.utils.*;
 
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Проверки запросов конкретных товаров")
+@DisplayName("Проверки GET запросов товаров")
 public class ProductGetTests {
 
     Faker faker = new Faker();
     static ProductService productService;
     Integer productId;
-    Response<Product> response;
     static ProductsMapper productsMapper;
 
-    @SneakyThrows
     @BeforeAll
-    static void beforeAll() {
+    static void beforeAll() throws IOException {
 
         productsMapper = DbUtils
                 .getProductsMapper();
@@ -36,23 +32,15 @@ public class ProductGetTests {
                 .create(ProductService.class);
     }
 
-    @SneakyThrows
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
 
-        response = productService
-                .createProduct(SetUp.createProduct())
-                .execute();
-
-        productId = response.body().getId();
-        assertThat(response.isSuccessful()).isTrue();
-        assertThat(response.code()).isEqualTo(201);
+        productId = CreateProduct.createProduct().getId();
     }
 
-    @DisplayName("Запрос существующего продукта")
-    @SneakyThrows
+    @DisplayName("Запрос продукта по заданному ID (позитивный тест)")
     @Test
-    void getProductPositiveTest() {
+    void getProductPositiveTest() throws IOException {
         Response<Product> response = productService
                 .getProduct(productId)
                 .execute();
@@ -63,10 +51,9 @@ public class ProductGetTests {
 
     }
 
-    @DisplayName("Запрос продукта по несуществующему ID")
-    @SneakyThrows
+    @DisplayName("Запрос продукта по несуществующему ID (негативный тест)")
     @Test
-    void getProductNegativeTest() {
+    void getProductNegativeTest() throws IOException {
         Response<Product> response = productService
                 .getProduct(faker.number().numberBetween(1, 1000))
                 .execute();
@@ -75,21 +62,19 @@ public class ProductGetTests {
         assertThat(response.errorBody().string()).contains(Errors.CODE404PROD.getMessage());
     }
 
-    @DisplayName("Запрос всех продуктов без указания ID")
-    @SneakyThrows
+    @DisplayName("Запрос продукта без указания ID (негативный тест)")
     @Test
-    void getAllProductPositiveTest() {
+    void getAllProductPositiveTest() throws IOException {
         Response<Product[]> response = productService
                 .getProducts()
                 .execute();
-        assertThat(response.code()).isEqualTo(200);
-        assertThat(response.isSuccessful()).isTrue();
+        assertThat(response.code()).isEqualTo(500);
+        assertThat(response.isSuccessful()).isFalse();
     }
 
-    @SneakyThrows
     @AfterEach
-    void tearDown() {
+    void tearDown() throws IOException {
 
-        TearDown.finishTests(productId, productService);
+        DeleteProduct.finishTests(productId, productService);
     }
 }

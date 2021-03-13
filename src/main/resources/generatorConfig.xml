@@ -35,16 +35,16 @@
         <table tableName="categories">
             <property name="useActualColumnNames" value="true"/>
             <generatedKey type="pre" column="id" sqlStatement="JDBC" identity="false" />
-            <!--                        <columnOverride column="id" property="category_id" />-->
-            <!--                        <ignoreColumn column="FRED" />-->
-            <!--                        <columnOverride column="LONG_VARCHAR_FIELD" jdbcType="VARCHAR" />-->
+                                    <columnOverride column="id" property="category_id" />
+<!--                                    <ignoreColumn column="FRED" />-->
+<!--                                    <columnOverride column="LONG_VARCHAR_FIELD" jdbcType="VARCHAR" />-->
         </table>
         <table tableName="products">
             <property name="useActualColumnNames" value="true"/>
             <generatedKey type="pre" column="id" sqlStatement="JDBC" identity="false" />
-            <!--            <columnOverride column="DATE_FIELD" property="startDate" />-->
-            <!--            <ignoreColumn column="FRED" />-->
-            <!--            <columnOverride column="LONG_VARCHAR_FIELD" jdbcType="VARCHAR" />-->
+                        <columnOverride column="DATE_FIELD" property="startDate" />
+<!--                        <ignoreColumn column="FRED" />-->
+<!--                        <columnOverride column="LONG_VARCHAR_FIELD" jdbcType="VARCHAR" />-->
         </table>
     </context>
 </generatorConfiguration>

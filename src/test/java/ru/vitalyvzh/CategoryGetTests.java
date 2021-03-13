@@ -1,6 +1,7 @@
 package ru.vitalyvzh;
 
 import com.github.javafaker.Faker;
+import io.qameta.allure.Description;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,16 +9,15 @@ import retrofit2.Response;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.dto.Category;
 import ru.vitalyvzh.service.CategoryService;
-import ru.vitalyvzh.utils.DbUtils;
 import ru.vitalyvzh.utils.RetrofitUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.vitalyvzh.base.enums.CategoryType.FOOD;
+import static ru.vitalyvzh.base.enums.CategoryType.AUTOANDINDUSTRIAL;
 
-@DisplayName("Проверки категорий товаров")
+@DisplayName("Проверки GET запросов категорий")
 public class CategoryGetTests {
 
     static CategoryService categoryService;
@@ -28,19 +28,21 @@ public class CategoryGetTests {
         categoryService = RetrofitUtils.getRetrofit().create(CategoryService.class);
     }
 
-    @DisplayName("Позитивная проверка категории Food")
+    @DisplayName("Запрос категории (позитивный тест)")
+    @Description("Проверка категории Food по существующему ID")
     @Test
     void getFoodCategoryPositiveTest() throws IOException {
 
         Response<Category> response = categoryService
-                .getCategory(FOOD.getId())
+                .getCategory(AUTOANDINDUSTRIAL.getId())
                 .execute();
-        assertThat(response.isSuccessful()).isTrue(); // код от 200 до 300
-        assertThat(response.body().getId()).as("Id is not equal to 1!").isEqualTo(1);
-        assertThat(response.body().getTitle()).as("Title is not Food").isEqualTo(FOOD.getTitle());
+        assertThat(response.isSuccessful()).isTrue();
+        assertThat(response.body().getId()).as("Id is not equal to 1!").isEqualTo(38);
+        assertThat(response.body().getTitle()).as("Title is not Auto & Industrial").isEqualTo(AUTOANDINDUSTRIAL.getTitle());
     }
 
-    @DisplayName("Негативная проверка категорий")
+    @DisplayName("Запрос категории (негативный тест)")
+    @Description("Проверка категории по несуществующему ID")
     @Test
     void getFoodCategoryNegativeTest() throws IOException {
         Response<Category> response = categoryService

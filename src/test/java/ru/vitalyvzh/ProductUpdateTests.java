@@ -1,58 +1,50 @@
 package ru.vitalyvzh;
 
 import com.github.javafaker.Faker;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 import retrofit2.Response;
 import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
+import ru.vitalyvzh.db.dao.ProductsMapper;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
-import ru.vitalyvzh.utils.RetrofitUtils;
-import ru.vitalyvzh.utils.SetUp;
-import ru.vitalyvzh.utils.TearDown;
+import ru.vitalyvzh.utils.*;
 
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Проверки обновления товаров")
+@DisplayName("Проверки PUT запросов товаров")
 public class ProductUpdateTests {
 
     Faker faker = new Faker();
     static ProductService productService;
-    Product product;
-    Product secondProduct;
-    Integer productId;
-    Response<Product> response;
+    static Integer productId;
+    static ProductsMapper productsMapper;
 
-    @SneakyThrows
     @BeforeAll
-    static void beforeAll() {
+    static void beforeAll() throws IOException {
+        productsMapper = DbUtils
+                .getProductsMapper();
         productService = RetrofitUtils
                 .getRetrofit()
                 .create(ProductService.class);
     }
 
-    @SneakyThrows
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
 
-        product = SetUp.createProduct();
-        secondProduct = SetUp.createProduct();
+        productId = CreateProduct
+                .createProduct().getId();
+        assertThat(CreateProduct
+                .createProduct().getId()).isNotNull();
 
-        response = productService
-                .createProduct(SetUp.createProduct())
-                .execute();
-
-        productId = response.body().getId();
-        assertThat(response.isSuccessful()).isTrue();
-        assertThat(response.code()).isEqualTo(201);
     }
 
-    @DisplayName("Позитивное обновление существующего продукта")
-    @SneakyThrows
+    @DisplayName("Обновление существующего продукта (позитивный тест)")
     @Test
-    void updateProductNewPositiveTest() {
+    void updateProductNewPositiveTest() throws IOException {
 
         Response<Product> response = productService
                 .updateProduct(new Product()
@@ -67,10 +59,9 @@ public class ProductUpdateTests {
 
     }
 
-    @DisplayName("Обновление существующего продукта по несуществующему ID")
-    @SneakyThrows
+    @DisplayName("Обновление продукта по несуществующему ID (негативный тест)")
     @Test
-    void updateProductNoExistIdNegativeTest() {
+    void updateProductNoExistIdNegativeTest() throws IOException {
         Response<Product> response = productService
                 .updateProduct(new Product()
                 .withId(faker.number().randomDigit())
@@ -78,15 +69,15 @@ public class ProductUpdateTests {
                 .withPrice(faker.number().numberBetween(1, 1000))
                 .withCategoryTitle(CategoryType.FOOD.getTitle()))
                 .execute();
+        productId = response.body().getId();
         assertThat(response.isSuccessful()).isFalse();
         assertThat(response.code()).isEqualTo(400);
-        assertThat(response.errorBody().string()).contains(Errors.CODE400NOEXIST.getMessage());
+        assertThat(response.errorBody().string()).contains(Errors.CODE400NOT_EXIST.getMessage());
     }
 
-    @DisplayName("Обновление существующего продукта с несуществующей категорией")
-    @SneakyThrows
+    @DisplayName("Обновление продукта в несуществующей категории (негативный тест)")
     @Test
-    void updateProductNoExistCategoryNegativeTest() {
+    void updateProductNoExistCategoryNegativeTest() throws IOException {
 
         Response<Product> response = productService
                 .updateProduct(new Product()
@@ -102,10 +93,9 @@ public class ProductUpdateTests {
 
     }
 
-    @SneakyThrows
     @AfterEach
-    void tearDown() {
+    void tearDown() throws IOException {
 
-        TearDown.finishTests(productId, productService);
+        DeleteProduct.finishTests(productId, productService);
     }
 }

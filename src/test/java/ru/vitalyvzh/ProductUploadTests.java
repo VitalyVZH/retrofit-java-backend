@@ -1,22 +1,22 @@
 package ru.vitalyvzh;
 
 import com.github.javafaker.Faker;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
-import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.db.dao.ProductsMapper;
 import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
+import ru.vitalyvzh.utils.CreateProduct;
 import ru.vitalyvzh.utils.DbUtils;
 import ru.vitalyvzh.utils.RetrofitUtils;
-import ru.vitalyvzh.utils.SetUp;
-import ru.vitalyvzh.utils.TearDown;
+import ru.vitalyvzh.utils.DeleteProduct;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@DisplayName("Проверки добавления конкретных товаров")
+@DisplayName("Проверки POST запросов товаров")
 public class ProductUploadTests {
 
     Faker faker = new Faker();
@@ -25,9 +25,8 @@ public class ProductUploadTests {
     Integer productId;
     static ProductsMapper productsMapper;
 
-    @SneakyThrows
     @BeforeAll
-    static void beforeAll() {
+    static void beforeAll() throws IOException {
 
         productsMapper = DbUtils
                 .getProductsMapper();
@@ -37,34 +36,31 @@ public class ProductUploadTests {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
 
-        product = SetUp.createProduct();
+        product = CreateProduct.createProduct();
+        productId = product.getId();
 
     }
 
-    @DisplayName("Добавление нового товара")
-    @SneakyThrows
+    @DisplayName("Добавление продукта (позитивный тест)")
     @Test
-    void createNewProductPositiveTest() {
-        retrofit2.Response<Product> response = productService
-                .createProduct(product)
-                .execute();
-        productId = response.body().getId();
-        assertThat(response.isSuccessful()).isTrue();
-        assertThat(response.code()).isEqualTo(201);
-        assertThat(response.body().getCategoryTitle()).isEqualTo(CategoryType.FOOD.getTitle());
-        assertThat(productsMapper.selectByPrimaryKey(Long.valueOf(productId)).getTitle())
-                .isEqualTo(product.getTitle());
+    void createNewProductPositiveTest() throws IOException {
+
+        productId = CreateProduct.createProduct().getId();
+
+        assertThat(productsMapper.selectByPrimaryKey(Long.valueOf(productId))).isNotNull();
+
     }
 
-    @DisplayName("Негативный тест добавления нового товара")
-    @SneakyThrows
+    @DisplayName("Добавление продукта (негативный тест)")
     @Test
-    void createNewProductNegativeTest() {
+    void createNewProductNegativeTest() throws IOException {
         retrofit2.Response<Product> response = productService
                 .createProduct(product.withId(faker.number().numberBetween(1, 1000)))
                 .execute();
+
+        productId = product.getId();
 
         if(response.body() != null) {
             productId = response.body().getId();
@@ -76,10 +72,9 @@ public class ProductUploadTests {
         assertThat(response.errorBody().string()).contains(Errors.CODE400NULL.getMessage());
     }
 
-    @SneakyThrows
     @AfterEach
-    void tearDown() {
+    void tearDown() throws IOException {
 
-        TearDown.finishTests(productId, productService);
+        DeleteProduct.finishTests(productId, productService);
     }
 }
