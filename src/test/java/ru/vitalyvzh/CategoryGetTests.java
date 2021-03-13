@@ -37,7 +37,7 @@ public class CategoryGetTests {
                 .getCategory(AUTOANDINDUSTRIAL.getId())
                 .execute();
         assertThat(response.isSuccessful()).isTrue();
-        assertThat(response.body().getId()).as("Id is not equal to 1!").isEqualTo(38);
+        assertThat(response.body().getId()).as("Id is not equal to 38!").isEqualTo(38);
         assertThat(response.body().getTitle()).as("Title is not Auto & Industrial").isEqualTo(AUTOANDINDUSTRIAL.getTitle());
     }
 

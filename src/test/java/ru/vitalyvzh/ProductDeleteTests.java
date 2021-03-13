@@ -2,17 +2,13 @@ package ru.vitalyvzh;
 
 import com.github.javafaker.Faker;
 import okhttp3.ResponseBody;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import retrofit2.Response;
+import org.junit.jupiter.api.*;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.db.dao.ProductsMapper;
-import ru.vitalyvzh.dto.Product;
 import ru.vitalyvzh.service.ProductService;
 import ru.vitalyvzh.utils.CreateProduct;
 import ru.vitalyvzh.utils.DbUtils;
+import ru.vitalyvzh.utils.DeleteProduct;
 import ru.vitalyvzh.utils.RetrofitUtils;
 
 import java.io.IOException;
@@ -79,5 +75,11 @@ public class ProductDeleteTests {
         assertThat(response.code()).isEqualTo(405);
         assertThat(response.errorBody().string().contains(Errors.CODE405.getMessage()));
         assertThat(DbUtils.getProductsMapper().selectByPrimaryKey(Long.valueOf(productId))).isNotNull();
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+
+        DeleteProduct.finishTests(productId, productService);
     }
 }

@@ -2,6 +2,7 @@ package ru.vitalyvzh;
 
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.*;
+import ru.vitalyvzh.base.enums.CategoryType;
 import ru.vitalyvzh.base.enums.Errors;
 import ru.vitalyvzh.db.dao.ProductsMapper;
 import ru.vitalyvzh.dto.Product;
@@ -35,14 +36,6 @@ public class ProductUploadTests {
                 .create(ProductService.class);
     }
 
-    @BeforeEach
-    void setUp() throws IOException {
-
-        product = CreateProduct.createProduct();
-        productId = product.getId();
-
-    }
-
     @DisplayName("Добавление продукта (позитивный тест)")
     @Test
     void createNewProductPositiveTest() throws IOException {
@@ -56,17 +49,15 @@ public class ProductUploadTests {
     @DisplayName("Добавление продукта (негативный тест)")
     @Test
     void createNewProductNegativeTest() throws IOException {
+        product = new Product()
+                .withId(faker.number().numberBetween(1, 1000))
+                .withTitle(faker.aviation().aircraft())
+                .withPrice(faker.number().numberBetween(10000, 25000))
+                .withCategoryTitle(CategoryType.AUTOANDINDUSTRIAL.getTitle());
+
         retrofit2.Response<Product> response = productService
-                .createProduct(product.withId(faker.number().numberBetween(1, 1000)))
+                .createProduct(product)
                 .execute();
-
-        productId = product.getId();
-
-        if(response.body() != null) {
-            productId = response.body().getId();
-        } else {
-            productId = null;
-        }
 
         assertThat(response.isSuccessful()).isFalse();
         assertThat(response.errorBody().string()).contains(Errors.CODE400NULL.getMessage());

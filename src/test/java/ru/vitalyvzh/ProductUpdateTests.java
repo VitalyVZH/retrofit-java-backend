@@ -22,6 +22,7 @@ public class ProductUpdateTests {
     static ProductService productService;
     static Integer productId;
     static ProductsMapper productsMapper;
+    Product product;
 
     @BeforeAll
     static void beforeAll() throws IOException {
@@ -35,10 +36,9 @@ public class ProductUpdateTests {
     @BeforeEach
     void setUp() throws IOException {
 
-        productId = CreateProduct
-                .createProduct().getId();
-        assertThat(CreateProduct
-                .createProduct().getId()).isNotNull();
+        product = CreateProduct.createProduct();
+        productId = product.getId();
+        assertThat(product.getId()).isNotNull();
 
     }
 
@@ -49,9 +49,9 @@ public class ProductUpdateTests {
         Response<Product> response = productService
                 .updateProduct(new Product()
                 .withId(productId)
-                .withTitle(faker.food().fruit())
-                .withPrice(faker.number().numberBetween(1, 1000))
-                .withCategoryTitle(CategoryType.FOOD.getTitle()))
+                .withTitle(faker.aviation().aircraft())
+                .withPrice(faker.number().numberBetween(10000, 25000))
+                .withCategoryTitle(CategoryType.AUTOANDINDUSTRIAL.getTitle()))
                 .execute();
 
         assertThat(response.isSuccessful()).isTrue();
@@ -69,7 +69,6 @@ public class ProductUpdateTests {
                 .withPrice(faker.number().numberBetween(1, 1000))
                 .withCategoryTitle(CategoryType.FOOD.getTitle()))
                 .execute();
-        productId = response.body().getId();
         assertThat(response.isSuccessful()).isFalse();
         assertThat(response.code()).isEqualTo(400);
         assertThat(response.errorBody().string()).contains(Errors.CODE400NOT_EXIST.getMessage());
@@ -82,7 +81,7 @@ public class ProductUpdateTests {
         Response<Product> response = productService
                 .updateProduct(new Product()
                 .withId(productId)
-                .withTitle(faker.food().fruit())
+                .withTitle(faker.aviation().aircraft())
                 .withPrice(faker.number().numberBetween(1, 1000))
                 .withCategoryTitle(faker.animal().name()))
                 .execute();
