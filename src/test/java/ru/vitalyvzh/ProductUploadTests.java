@@ -66,6 +66,6 @@ public class ProductUploadTests {
     @AfterEach
     void tearDown() throws IOException {
 
-        DeleteProduct.finishTests(productId, productService);
+        DeleteProduct.finishTests(productId);
     }
 }

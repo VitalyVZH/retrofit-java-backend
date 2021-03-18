@@ -75,6 +75,6 @@ public class ProductGetTests {
     @AfterEach
     void tearDown() throws IOException {
 
-        DeleteProduct.finishTests(productId, productService);
+        DeleteProduct.finishTests(productId);
     }
 }
