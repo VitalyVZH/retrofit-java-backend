@@ -12,7 +12,6 @@ import ru.vitalyvzh.service.CategoryService;
 import ru.vitalyvzh.utils.RetrofitUtils;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.vitalyvzh.base.enums.CategoryType.AUTOANDINDUSTRIAL;
@@ -24,7 +23,7 @@ public class CategoryGetTests {
     Faker faker = new Faker();
 
     @BeforeAll
-    static void beforeAll() throws MalformedURLException {
+    static void beforeAll() {
         categoryService = RetrofitUtils.getRetrofit().create(CategoryService.class);
     }
 
